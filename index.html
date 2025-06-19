@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Dividend Tracker</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.22.5/babel.min.js"></script>
+</head>
+<body>
+  <div id="root" class="min-h-screen bg-gray-100"></div>
+  <script type="text/babel">
+    const App = () => {
+      const [weeklyStocks, setWeeklyStocks] = React.useState([]);
+      const [monthlyStocks, setMonthlyStocks] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [error, setError] = React.useState(null);
+
+      React.useEffect(() => {
+        // Mock API call (replace with real API like Alpha Vantage)
+        const fetchDividendStocks = async () => {
+          try {
+            // Simulated API response
+            const mockData = {
+              weekly: [
+                { symbol: 'STAG', name: 'STAG Industrial', yield: 4.8, price: 35.20 },
+                { symbol: 'O', name: 'Realty Income', yield: 4.5, price: 55.10 },
+                { symbol: 'MAIN', name: 'Main Street Capital', yield: 4.3, price: 45.30 },
+                { symbol: 'PSEC', name: 'Prospect Capital', yield: 4.1, price: 22.50 },
+                { symbol: 'HRZN', name: 'Horizon Technology', yield: 4.0, price: 33.40 },
+                { symbol: 'GLAD', name: 'Gladstone Capital', yield: 3.9, price: 28.70 },
+                { symbol: 'GOOD', name: 'Gladstone Commercial', yield: 3.8, price: 31.20 },
+                { symbol: 'LTC', name: 'LTC Properties', yield: 3.7, price: 42.10 },
+                { symbol: 'GAIN', name: 'Gladstone Investment', yield: 3.6, price: 27.90 },
+                { symbol: 'PNNT', name: 'PennantPark Investment', yield: 3.5, price: 24.60 },
+              ],
+              monthly: [
+                { symbol: 'AGNC', name: 'AGNC Investment', yield: 9.2, price: 15.60 },
+                { symbol: 'ARR', name: 'ARMOUR Residential', yield: 8.9, price: 12.30 },
+                { symbol: 'DX', name: 'Dynex Capital', yield: 8.7, price: 14.20 },
+                { symbol: 'EFC', name: 'Ellington Financial', yield: 8.5, price: 16.80 },
+                { symbol: 'NLY', name: 'Annaly Capital', yield: 8.3, price: 19.40 },
+                { symbol: 'TWO', name: 'Two Harbors', yield: 8.1, price: 13.50 },
+                { symbol: 'CIM', name: 'Chimera Investment', yield: 7.9, price: 17.20 },
+                { symbol: 'IVR', name: 'Invesco Mortgage', yield: 7.7, price: 11.90 },
+                { symbol: 'ORC', name: 'Orchid Island', yield: 7.5, price: 10.50 },
+                { symbol: 'MFA', name: 'MFA Financial', yield: 7.3, price: 14.70 },
+              ],
+            };
+
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Sort by yield and take top 10
+            setWeeklyStocks(mockData.weekly.sort((a, b) => b.yield - a.yield).slice(0, 10));
+            setMonthlyStocks(mockData.monthly.sort((a, b) => b.yield - a.yield).slice(0, 10));
+            setLoading(false);
+          } catch (err) {
+            setError('Failed to fetch stock data');
+            setLoading(false);
+          }
+        };
+
+        fetchDividendStocks();
+      }, []);
+
+      const StockTable = ({ title, stocks }) => (
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white shadow-md rounded-lg">
+              <thead>
+                <tr className="bg-gray-200 text-gray-600 uppercase text-sm">
+                  <th className="py-3 px-6 text-left">Symbol</th>
+                  <th className="py-3 px-6 text-left">Name</th>
+                  <th className="py-3 px-6 text-right">Dividend Yield (%)</th>
+                  <th className="py-3 px-6 text-right">Price ($)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stocks.map(stock => (
+                  <tr key={stock.symbol} className="border-b hover:bg-gray-50">
+                    <td className="py-4 px-6 font-medium text-gray-900">{stock.symbol}</td>
+                    <td className="py-4 px-6 text-gray-700">{stock.name}</td>
+                    <td className="py-4 px-6 text-right">{stock.yield.toFixed(2)}</td>
+                    <td className="py-4 px-6 text-right">{stock.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+
+      return (
+        <div className="container mx-auto p-4">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+            Dividend Stock Tracker
+          </h1>
+          {loading && <p className="text-center text-gray-600">Loading...</p>}
+          {error && <p className="text-center text-red-600">{error}</p>}
+          {!loading && !error && (
+            <>
+              <StockTable title="Top 10 Weekly Dividend Stocks" stocks={weeklyStocks} />
+              <StockTable title="Top 10 Monthly Dividend Stocks" stocks={monthlyStocks} />
+            </>
+          )}
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+  <script>
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
